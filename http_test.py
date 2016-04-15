@@ -1,5 +1,5 @@
 import unittest
-from http_get import * 
+from http_get import *
 
 class HTTPTestBasic(unittest.TestCase):
     def test_url_parse(self):
@@ -16,23 +16,26 @@ class HTTPTestBasic(unittest.TestCase):
 
 class HTTPParserTestBasic(unittest.TestCase):
     def test_http_parse(self):
-        string = (
-"HTTP/1.1 200 OK\r\n\
+        content = bytearray('hello, world')
+        string = bytearray(
+b"HTTP/1.1 200 OK\r\n\
 Connection: Close\r\n\
 Server: Garble\r\n\
 Content-Type: text/html\r\n\
+Content-Length: %d\r\n\
 \r\n\
-<html></html>\r\n")
-        resp = HTTPResponse(string) 
-        self.assertEqual(resp.content, '<html></html>\n')
+%s" % (len(content), content))
+        resp = HTTPResponse(string)
         self.assertEqual(resp.return_code, '200')
         self.assertEqual(resp.http_version, '1.1')
         self.assertTrue(resp.ok)
         self.assertEqual(resp.headers,
             {'connection':'close',
              'content-type':'text/html',
+             'content-length':str(len(content)),
              'server': 'garble'})
-
+        self.assertEqual(resp.content, content)
+        
 
 if __name__ == '__main__':
     unittest.main()
